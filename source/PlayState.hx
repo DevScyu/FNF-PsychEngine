@@ -2592,7 +2592,7 @@ class PlayState extends MusicBeatState
 				killHenchmen();
 
 			case 'Add Camera Zoom':
-				if(ClientPrefs.camZooms && FlxG.camera.zoom < 1.35) {
+				if(ClientPrefs.camZooms) {
 					var camZoom:Float = Std.parseFloat(value1);
 					var hudZoom:Float = Std.parseFloat(value2);
 					if(Math.isNaN(camZoom)) camZoom = 0.015;
@@ -2600,6 +2600,18 @@ class PlayState extends MusicBeatState
 
 					FlxG.camera.zoom += camZoom;
 					camHUD.zoom += hudZoom;
+				}
+
+			case 'Set Camera Zoom':
+				if(ClientPrefs.camZooms) {
+					var camZoom:Float = Std.parseFloat(value1);
+					var tweenSpeed:Float = Std.parseFloat(value2);
+					if(Math.isNaN(camZoom)) camZoom = 1.05;
+					if(Math.isNaN(tweenSpeed)) tweenSpeed = 0.5;
+
+					defaultCamZoom = camZoom;
+
+					FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, tweenSpeed);
 				}
 
 			case 'Trigger BG Ghouls':
