@@ -115,7 +115,7 @@ class Note extends FlxSprite
 			prevNote = this;
 
 		this.prevNote = prevNote;
-		isSustainNote = sustainNote;
+		this.isSustainNote = sustainNote;
 		this.inEditor = inEditor;
 
 		x += (ClientPrefs.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50 - NoteGraphic.getOffset();
@@ -126,8 +126,11 @@ class Note extends FlxSprite
 
 		this.noteData = noteData;
 
+		loadNoteData(true);
+	}
+
+	public function loadNoteData(first:Bool = false) {
 		var animToPlay:String = NoteGraphic.fromIndex(noteData % PlayState.SONG.songKeys);
-		trace(strumTime + "Note: " + animToPlay + " Data: " + noteData);
 		if(noteData > -1) {
 			texture = '';
 			colorSwap = new ColorSwap();
@@ -138,9 +141,6 @@ class Note extends FlxSprite
 				animation.play(animToPlay + 'Scroll');
 			}
 		}
-
-		// trace(prevNote);
-
 		if (isSustainNote && prevNote != null)
 		{
 			alpha = 0.6;
@@ -156,21 +156,23 @@ class Note extends FlxSprite
 
 			offsetX -= width / 2;
 
-			if (PlayState.isPixelStage)
+			if (PlayState.isPixelStage && first)
 				offsetX += 30;
 
 			if (prevNote.isSustainNote)
 			{
 				prevNote.animation.play(NoteGraphic.fromIndex(prevNote.noteData % PlayState.SONG.songKeys) + 'hold');
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05 * PlayState.SONG.speed;
-				if(PlayState.isPixelStage) {
-					prevNote.scale.y *= 1.19;
+				if (first) {
+					prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05 * PlayState.SONG.speed;
+					if(PlayState.isPixelStage) {
+						prevNote.scale.y *= 1.19;
+					}
 				}
 				prevNote.updateHitbox();
 				// prevNote.setGraphicSize();
 			}
 
-			if(PlayState.isPixelStage) {
+			if(PlayState.isPixelStage && first) {
 				scale.y *= PlayState.daPixelZoom;
 				updateHitbox();
 			}
@@ -178,6 +180,8 @@ class Note extends FlxSprite
 			earlyHitMult = 1;
 		}
 		x += offsetX;
+
+//		reloadNote();
 	}
 
 	function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = '') {
@@ -261,7 +265,7 @@ class Note extends FlxSprite
 		}
 	}
 
-	override function update(elapsed:Float)
+	public override function update(elapsed:Float)
 	{
 		super.update(elapsed);
 

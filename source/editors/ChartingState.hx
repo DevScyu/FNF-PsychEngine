@@ -73,6 +73,7 @@ class ChartingState extends MusicBeatState
 		['Add Camera Zoom', "Used on MILF on that one \"hard\" part\nValue 1: Camera zoom add (Default: 0.015)\nValue 2: UI zoom add (Default: 0.03)\nLeave the values blank if you want to use Default."],
 		['Set Camera Zoom', "Set's the camera zoom level\nValue 1: Camera zoom add (Default: 1.05)\nValue 2: Camera Tween Speed (Default: 0.5)\nLeave the values blank if you want to use Default."],
 		['BG Freaks Expression', "Should be used only in \"school\" Stage!"],
+		['Key Change', "Value 1: Number of keys to use"],
 		['Trigger BG Ghouls', "Should be used only in \"schoolEvil\" Stage!"],
 		['Play Animation', "Plays an animation on a Character,\nonce the animation is completed,\nthe animation changes to Idle\n\nValue 1: Animation to play.\nValue 2: Character (Dad, BF, GF)"],
 		['Camera Follow Pos', "Value 1: X\nValue 2: Y\n\nThe camera won't change the follow point\nafter using this, for getting it back\nto normal, leave both values blank."],
@@ -224,6 +225,7 @@ class ChartingState extends MusicBeatState
 				speed: 1,
 				stage: 'stage',
 				songKeys: 4,
+				originalKeys: 4,
 				validScore: false
 			};
 		}
@@ -2149,6 +2151,7 @@ class ChartingState extends MusicBeatState
 			player3: _song.player3,
 			stage: _song.stage,
 			songKeys: _song.songKeys,
+			originalKeys: _song.originalKeys,
 			validScore: false
 		};
 		var json = {

@@ -284,6 +284,8 @@ class PlayState extends MusicBeatState
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
 
+		SONG.songKeys = SONG.originalKeys;
+
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
@@ -1656,17 +1658,17 @@ class PlayState extends MusicBeatState
 		return FlxSort.byValues(FlxSort.ASCENDING, Obj1[0] - earlyTime1, Obj2[0] - earlyTime2);
 	}
 
-	private function generateStaticArrows(player:Int):Void
+	private function generateStaticArrows(player:Int,tween:Bool = true):Void
 	{
 		for (i in 0...SONG.songKeys)
 		{
 			// FlxG.log.add(i);
 			var babyArrow:StrumNote = new StrumNote(ClientPrefs.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X, strumLine.y, i, player);
-			if (!isStoryMode)
+			if (!isStoryMode && tween)
 			{
 				babyArrow.y -= 10;
-				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * NoteGraphic.convertForKeys(i))});
+                babyArrow.alpha = 0;
+                FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * NoteGraphic.convertForKeys(i))});
 			}
 
 			if (player == 1)
@@ -1822,6 +1824,8 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 	var limoSpeed:Float = 0;
+
+	var updateNotes:Bool = false;
 
 	override public function update(elapsed:Float)
 	{
@@ -2118,6 +2122,9 @@ class PlayState extends MusicBeatState
 			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
 			{
 				var dunceNote:Note = unspawnNotes[0];
+				if(updateNotes) {
+					dunceNote.loadNoteData();
+				}
 				notes.add(dunceNote);
 
 				var index:Int = unspawnNotes.indexOf(dunceNote);
@@ -2758,6 +2765,24 @@ class PlayState extends MusicBeatState
 
 			case 'BG Freaks Expression':
 				if(bgGirls != null) bgGirls.swapDanceType();
+
+			case 'Key Change':
+				var newKeys = Std.parseInt(value1);
+				if(newKeys == null || newKeys < 4 || newKeys > 9) {
+					newKeys = 4;
+				}
+				SONG.songKeys = newKeys;
+				// Remove old strum notes
+                remove(strumLineNotes);
+				opponentStrums = new FlxTypedGroup<StrumNote>();
+				playerStrums = new FlxTypedGroup<StrumNote>();
+				strumLineNotes = new FlxTypedGroup<StrumNote>();
+                add(strumLineNotes);
+                strumLineNotes.cameras = [camHUD];
+                generateStaticArrows(0, false);
+                generateStaticArrows(1, false);
+				updateNotes = true;
+
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
 	}
