@@ -13,6 +13,7 @@ using StringTools;
 class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
+	public var position:Int = -1;
 
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
@@ -81,7 +82,7 @@ class Note extends FlxSprite
 		colorSwap.saturation = ClientPrefs.arrowHSV[NoteGraphic.convertForKeys(noteData) % PlayState.SONG.songKeys][1] / 100;
 		colorSwap.brightness = ClientPrefs.arrowHSV[NoteGraphic.convertForKeys(noteData) % PlayState.SONG.songKeys][2] / 100;
 
-		if(noteData > -1 && noteType != value) {
+		if(noteData > -1) {
 			switch(value) {
 				case 'Hurt Note':
 					ignoreNote = mustPress;
@@ -181,7 +182,42 @@ class Note extends FlxSprite
 		}
 		x += offsetX;
 
-//		reloadNote();
+		if(!first) {
+			updateNote();
+		}
+
+	}
+
+	function updateNote() {
+		var animName:String = null;
+		if(animation.curAnim != null) {
+			animName = animation.curAnim.name;
+		}
+
+		var lastScaleY:Float = scale.y;
+
+		frames = this.graphic.atlasFrames;
+
+		if(PlayState.isPixelStage) {
+			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+			loadPixelNoteAnims();
+			antialiasing = false;
+		} else {
+			loadNoteAnims();
+			antialiasing = ClientPrefs.globalAntialiasing;
+		}
+		if(isSustainNote) {
+			scale.y = lastScaleY;
+		}
+		updateHitbox();
+
+		if(animName != null)
+			animation.play(animName, true);
+
+		if(inEditor) {
+			setGraphicSize(ChartingState.GRID_SIZE, ChartingState.GRID_SIZE);
+			updateHitbox();
+		}
 	}
 
 	function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = '') {
