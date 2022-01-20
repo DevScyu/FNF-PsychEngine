@@ -7,6 +7,7 @@ import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flash.display.BitmapData;
 import editors.ChartingState;
+import Section.SwagSection;
 
 using StringTools;
 
@@ -14,6 +15,7 @@ class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
 	public var position:Int = -1;
+	public var section:SwagSection = null;
 
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;

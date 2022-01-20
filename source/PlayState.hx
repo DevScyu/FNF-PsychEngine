@@ -1553,6 +1553,8 @@ class PlayState extends MusicBeatState
 
 					var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
 					swagNote.mustPress = gottaHitNote;
+					swagNote.position = songNotes[1];
+					swagNote.section = section;
 					swagNote.sustainLength = songNotes[2];
 					swagNote.noteType = songNotes[3];
 					if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = editors.ChartingState.noteTypeList[songNotes[3]]; //Backward compatibility + compatibility with Week 7 charts
@@ -1571,7 +1573,9 @@ class PlayState extends MusicBeatState
 
 							var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + (Conductor.stepCrochet / FlxMath.roundDecimal(SONG.speed, 2)), daNoteData, oldNote, true);
 							sustainNote.mustPress = gottaHitNote;
+							sustainNote.position = swagNote.position;
 							sustainNote.noteType = swagNote.noteType;
+							sustainNote.section = swagNote.section;
 							sustainNote.scrollFactor.set();
 							unspawnNotes.push(sustainNote);
 
@@ -2118,13 +2122,27 @@ class PlayState extends MusicBeatState
 		{
 			var time:Float = 1500;
 			if(roundedSpeed < 1) time /= roundedSpeed;
-
+			var oldNote:Array<Note> = [];
 			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
 			{
 				var dunceNote:Note = unspawnNotes[0];
 				if(updateNotes) {
+					var gottaHitNote:Bool = dunceNote.section.mustHitSection;
+
+					if (dunceNote.position > SONG.songKeys - 1)
+					{
+						gottaHitNote = !gottaHitNote;
+					}
+					if (dunceNote.isSustainNote && oldNote[dunceNote.position] != null && oldNote[dunceNote.position].isSustainNote) {
+						dunceNote.mustPress = oldNote[dunceNote.position].mustPress;
+					} else {
+						dunceNote.mustPress = gottaHitNote;
+						dunceNote.noteData = Std.int(dunceNote.position % SONG.songKeys);
+					}
+					dunceNote.noteType = dunceNote.noteType;
 					dunceNote.loadNoteData();
 				}
+				oldNote[dunceNote.position] = dunceNote;
 				notes.add(dunceNote);
 
 				var index:Int = unspawnNotes.indexOf(dunceNote);
@@ -2767,21 +2785,29 @@ class PlayState extends MusicBeatState
 				if(bgGirls != null) bgGirls.swapDanceType();
 
 			case 'Key Change':
-				var newKeys = Std.parseInt(value1);
-				if(newKeys == null || newKeys < 4 || newKeys > 9) {
-					newKeys = 4;
-				}
-				SONG.songKeys = newKeys;
-				// Remove old strum notes
-                remove(strumLineNotes);
-				opponentStrums = new FlxTypedGroup<StrumNote>();
-				playerStrums = new FlxTypedGroup<StrumNote>();
-				strumLineNotes = new FlxTypedGroup<StrumNote>();
-                add(strumLineNotes);
-                strumLineNotes.cameras = [camHUD];
-                generateStaticArrows(0, false);
-                generateStaticArrows(1, false);
-				updateNotes = true;
+                var r = ~/[,]/g;
+                var keydifficulties: Array<String> = r.split(value2);
+				trace(keydifficulties);
+                if (keydifficulties.length == 0 || keydifficulties == []) {
+					keydifficulties = ['0', '1', '2'];
+                }
+                if (keydifficulties.contains(Std.string(storyDifficulty))) {
+                    var newKeys = Std.parseInt(value1);
+                    if(newKeys == null || newKeys < 4 || newKeys > 9) {
+                        newKeys = 4;
+                    }
+                    SONG.songKeys = newKeys;
+                    // Remove old strum notes
+                    remove(strumLineNotes);
+                    opponentStrums = new FlxTypedGroup<StrumNote>();
+                    playerStrums = new FlxTypedGroup<StrumNote>();
+                    strumLineNotes = new FlxTypedGroup<StrumNote>();
+                    add(strumLineNotes);
+                    strumLineNotes.cameras = [camHUD];
+                    generateStaticArrows(0, false);
+                    generateStaticArrows(1, false);
+                    updateNotes = true;
+                }
 
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
