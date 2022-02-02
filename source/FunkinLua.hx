@@ -5,12 +5,19 @@ import llua.State;
 import llua.Convert;
 #end
 
+import haxe.EnumTools;
+import flixel.addons.effects.chainable.FlxShakeEffect;
+import flixel.addons.effects.chainable.FlxTrailEffect;
+import flixel.addons.effects.chainable.FlxWaveEffect;
+import flixel.addons.effects.chainable.FlxOutlineEffect;
+import flixel.addons.effects.chainable.FlxRainbowEffect;
+import flixel.addons.effects.chainable.FlxEffectSprite;
+import flixel.addons.effects.chainable.FlxGlitchEffect;
 import flixel.FlxG;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
 import flixel.text.FlxText;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.math.FlxPoint;
 import flixel.system.FlxSound;
 import flixel.util.FlxTimer;
 import flixel.FlxSprite;
@@ -18,14 +25,12 @@ import flixel.FlxCamera;
 import flixel.util.FlxColor;
 import flixel.FlxBasic;
 import flixel.FlxObject;
-import flixel.FlxSprite;
 import openfl.display.BlendMode;
 #if sys
 import sys.FileSystem;
 import sys.io.File;
 #end
 import Type.ValueType;
-import Controls;
 import DialogueBoxPsych;
 
 using StringTools;
@@ -715,6 +720,85 @@ class FunkinLua {
 				if(cock.animation.curAnim == null) {
 					cock.animation.play(name, true);
 				}
+			}
+		});
+		Lua_helper.add_callback(lua, "removeLuaEffect", function(tag:String, destroy:Bool = true) {
+			if(!lePlayState.modchartEffects.exists(tag)) {
+				return;
+			}
+
+			var pee:FlxEffectSprite = lePlayState.modchartEffects.get(tag);
+			if(destroy) {
+				pee.kill();
+			}
+
+			lePlayState.remove(pee, true);
+
+			if(destroy) {
+				pee.destroy();
+				lePlayState.modchartEffects.remove(tag);
+			}
+		});
+		Lua_helper.add_callback(lua, "addWaveEffect", function(obj:String, strength:Int = 10, speed:Float = 3, waveLength:Int = 10, interlaceOffset:Float = 0) {
+			var object:FlxSprite;
+			if(lePlayState.modchartSprites.exists(obj)) {
+				object = lePlayState.modchartSprites.get(obj);
+			} else {
+				object = Reflect.getProperty(lePlayState, obj);
+			}
+			var _effectSprite:FlxEffectSprite;
+			var position:Int = lePlayState.members.indexOf(object);
+			lePlayState.insert(position, _effectSprite = new FlxEffectSprite(object));
+			lePlayState.modchartEffects.set(obj + "_wave", _effectSprite);
+//			_effectSprite.scrollFactor.set(object.scrollFactor.x, object.scrollFactor.y);
+			_effectSprite.scale.copyFrom(object.scale);
+			_effectSprite.width = object.width;
+			_effectSprite.height = object.height;
+			_effectSprite.updateHitbox();
+			_effectSprite.x = object.x;
+			_effectSprite.y = object.y;
+			object.x = 99999;
+			object.y = 99999;
+			// Effects
+
+			var center:Float = 0.5;
+
+			 var _wave:FlxWaveEffect = new FlxWaveEffect(ALL, strength, center, speed, waveLength, HORIZONTAL, interlaceOffset);
+			 _effectSprite.effects.push(_wave);
+
+		});
+		Lua_helper.add_callback(lua, "addEffect", function(obj:String, effect:String) {
+			var object:FlxSprite;
+			if(lePlayState.modchartSprites.exists(obj)) {
+				object = lePlayState.modchartSprites.get(obj);
+			} else {
+				object = Reflect.getProperty(lePlayState, obj);
+			}
+			var _effectSprite:FlxEffectSprite;
+			var position:Int = lePlayState.members.indexOf(object);
+			lePlayState.insert(position, _effectSprite = new FlxEffectSprite(object));
+			_effectSprite.x = object.x;
+			_effectSprite.y = object.y;
+			object.x = 99999;
+			object.y = 99999;
+			// Effects
+			var _rainbow:FlxRainbowEffect = new FlxRainbowEffect(0.5);
+			var _outline:FlxOutlineEffect = new FlxOutlineEffect(FlxColor.RED, 8);
+			var _wave:FlxWaveEffect = new FlxWaveEffect(FlxWaveMode.ALL);
+			var _glitch:FlxGlitchEffect = new FlxGlitchEffect(50, 30, 0.2, HORIZONTAL);
+			var _trail:FlxTrailEffect = new FlxTrailEffect(_effectSprite, 10, 0.5, 8);
+			switch (effect) {
+				case 'rainbow':
+					_effectSprite.effects.push(_rainbow);
+				case 'outline':
+					_effectSprite.effects.push(_outline);
+				case 'wave':
+					_effectSprite.effects.push(_wave);
+				case 'glitch':
+					_effectSprite.effects.push(_glitch);
+				case 'trail':
+					_effectSprite.effects.push(_trail);
+
 			}
 		});
 		Lua_helper.add_callback(lua, "addAnimationByIndices", function(obj:String, name:String, prefix:String, indices:String, framerate:Int = 24) {
