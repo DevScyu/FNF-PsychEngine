@@ -380,6 +380,7 @@ class CharacterEditorState extends MusicBeatState
 	var positionCameraYStepper:FlxUINumericStepper;
 
 	var flipXCheckBox:FlxUICheckBox;
+	var ghostCheckBox:FlxUICheckBox;
 	var noAntialiasingCheckBox:FlxUICheckBox;
 
 	var healthColorStepperR:FlxUINumericStepper;
@@ -401,6 +402,12 @@ class CharacterEditorState extends MusicBeatState
 		});
 
 		healthIconInputText = new FlxUIInputText(15, imageInputText.y + 35, 75, leHealthIcon.getCharacter(), 8);
+
+		ghostCheckBox = new FlxUICheckBox(healthIconInputText.x + 80, healthIconInputText.y, null, null, "Apply ghost effect", 100);
+		ghostCheckBox.checked = char.ghostEffect;
+		ghostCheckBox.callback = function() {
+			char.ghostEffect = char.ghostEffect;
+		};
 
 		singDurationStepper = new FlxUINumericStepper(15, healthIconInputText.y + 45, 0.1, 4, 0, 999, 1);
 
@@ -453,6 +460,7 @@ class CharacterEditorState extends MusicBeatState
 		tab_group.add(healthIconInputText);
 		tab_group.add(singDurationStepper);
 		tab_group.add(scaleStepper);
+		tab_group.add(ghostCheckBox);
 		tab_group.add(flipXCheckBox);
 		tab_group.add(noAntialiasingCheckBox);
 		tab_group.add(positionXStepper);
@@ -1126,7 +1134,8 @@ class CharacterEditorState extends MusicBeatState
 			"scale": char.jsonScale,
 			"sing_duration": char.singDuration,
 			"healthicon": char.healthIcon,
-		
+			"ghostEffect": char.ghostEffect,
+
 			"position":	char.positionArray,
 			"camera_position": char.cameraPosition,
 		

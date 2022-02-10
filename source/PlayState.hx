@@ -740,10 +740,16 @@ class PlayState extends MusicBeatState
 			case 'limo':
 				resetFastCar();
 				insert(members.indexOf(gfGroup) - 1, fastCar);
+		}
 
-			case 'schoolEvil':
-				var evilTrail = new FlxTrail(dad, null, 4, 24, 0.3, 0.069); //nice
-				insert(members.indexOf(dadGroup) - 1, evilTrail);
+		if(dad.ghostEffect) {
+			var evilTrail = new FlxTrail(dad, null, 4, 24, 0.3, 0.069); //nice
+			insert(members.indexOf(dadGroup) - 1, evilTrail);
+		}
+
+		if(boyfriend.ghostEffect) {
+			var evilTrail = new FlxTrail(boyfriend, null, 4, 24, 0.3, 0.069); //nice
+			insert(members.indexOf(boyfriendGroup) - 1, evilTrail);
 		}
 
 		var dialogueJson:DialogueFile = null;
