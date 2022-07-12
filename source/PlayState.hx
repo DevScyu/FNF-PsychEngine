@@ -2777,6 +2777,7 @@ class PlayState extends MusicBeatState
 								gf.alpha = 1;
 								gf.alreadyLoaded = true;
 							}
+							gf.visible = true;
 						}
 				}
 				reloadHealthBarColors();
