@@ -74,7 +74,7 @@ jobs:
         run: |
           haxelib run lime build ${{ matrix.target }}
 
-      - name: Archive code coverage results
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Build artifacts
