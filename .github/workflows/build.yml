@@ -15,45 +15,26 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        haxe-version: [4.2.2]
-        target: [linux, windows, mac]
-        exclude:
-          - os: ubuntu-latest
-            target: windows
-          - os: ubuntu-latest
-            target: mac
-          - os: windows-latest
-            target: linux
-          - os: windows-latest
-            target: mac
-          - os: macos-latest
-            target: linux
-          - os: macos-latest
-            target: windows
     steps:
       - name: Fetch sources
         uses: actions/checkout@v2
-      - name: Setup Haxe (${{ matrix.target }}, haxe ${{ matrix.haxe-version }}, ${{ matrix.os }})
+
+      - name: Setup Haxe
         uses: krdlab/setup-haxe@v1
         with:
-          haxe-version: ${{ matrix.haxe-version }}
+          haxe-version: 4.2.2
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-haxe
         with:
-          path: ~/haxelib
+          path: C:/haxelib
           key: ${{ runner.os }}-build-${{ env.cache-name }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}
 
-      - name: Setup app (${{ matrix.target }}, haxe ${{ matrix.haxe-version }}, ${{ matrix.os }})
+      - name: Setup app
         run: |
           haxelib install lime --always --quiet
           haxelib install openfl --always --quiet
@@ -70,12 +51,14 @@ jobs:
           haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc
           haxelib install actuate
           haxelib git extension-webm https://github.com/KadeDev/extension-webm
-      - name: Build app (${{ matrix.target }}, haxe ${{ matrix.haxe-version }}, ${{ matrix.os }})
+
+
+      - name: Build app
         run: |
-          haxelib run lime build ${{ matrix.target }}
+          haxelib run lime build windows
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Build artifacts
-          path: export/release/**/bin
+          path: export/release/windows/bin/*.exe
