@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  haxe:
+    build:
+      context: .
+    volumes:
+      - .:/app
+      - .lime:/root/.lime
+    command: "lime build windows -v -cpp"
