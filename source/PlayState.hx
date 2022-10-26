@@ -1830,6 +1830,7 @@ class PlayState extends MusicBeatState
 	var limoSpeed:Float = 0;
 
 	var updateNotes:Bool = false;
+	var noteTextureUpdate:Bool = false;
 
 	override public function update(elapsed:Float)
 	{
@@ -2141,6 +2142,9 @@ class PlayState extends MusicBeatState
 					}
 					dunceNote.noteType = dunceNote.noteType;
 					dunceNote.loadNoteData();
+				}
+				if (noteTextureUpdate) {
+					dunceNote.reloadNote();
 				}
 				oldNote[dunceNote.position] = dunceNote;
 				notes.add(dunceNote);
@@ -2809,6 +2813,27 @@ class PlayState extends MusicBeatState
                     generateStaticArrows(1, false);
                     updateNotes = true;
                 }
+
+			case 'UI Change':
+				if (value1.toLowerCase().trim() == "pixel") {
+					PlayState.isPixelStage = true;
+				} else {
+					PlayState.isPixelStage = false;
+				}
+
+				remove(strumLineNotes);
+				strumLineNotes = new FlxTypedGroup<StrumNote>();
+				strumLineNotes.cameras = [camHUD];
+				add(strumLineNotes);
+
+				generateStaticArrows(0, false);
+				generateStaticArrows(1, false);
+
+				noteTextureUpdate = true;
+
+				notes.forEachAlive(function (note:Note) {
+					note.reloadNote();
+				});
 
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);

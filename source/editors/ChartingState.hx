@@ -74,6 +74,7 @@ class ChartingState extends MusicBeatState
 		['Set Camera Zoom', "Set's the camera zoom level\nValue 1: Camera zoom add (Default: 1.05)\nValue 2: Camera Tween Speed (Default: 0.5)\nLeave the values blank if you want to use Default."],
 		['BG Freaks Expression', "Should be used only in \"school\" Stage!"],
 		['Key Change', "Value 1: Number of keys to use\nValue 2: Difficulties to be active on, comma seperated, without spaces.\n0 - easy, 1 - normal, 2 - hard"],
+		['UI Change', "Value 1: Pixel / Normal"],
 		['Trigger BG Ghouls', "Should be used only in \"schoolEvil\" Stage!"],
 		['Play Animation', "Plays an animation on a Character,\nonce the animation is completed,\nthe animation changes to Idle\n\nValue 1: Animation to play.\nValue 2: Character (Dad, BF, GF)"],
 		['Camera Follow Pos', "Value 1: X\nValue 2: Y\n\nThe camera won't change the follow point\nafter using this, for getting it back\nto normal, leave both values blank."],
